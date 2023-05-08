@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{3AFC03F3-21BF-4D41-8E4F-066BC6B38D08}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordRepeaterBot.DataAccess", "Src\WordRepeaterBot.DataAccess\WordRepeaterBot.DataAccess.csproj", "{FDD1BEE4-AB54-49A5-815C-2665626C5B6C}"
@@ -18,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordRepeaterBot.Application
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{30561894-50EB-41EF-A99E-910308E09A22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordRepeaterBot.Sender", "..\Src\WordRepeaterBot.Sender\WordRepeaterBot.Sender.csproj", "{72FC6397-50E2-4E76-BEB0-951CD0EA4036}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordRepeaterBot.Sender", "..\Src\WordRepeaterBot.Sender\WordRepeaterBot.Sender.csproj", "{72FC6397-50E2-4E76-BEB0-951CD0EA4036}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
