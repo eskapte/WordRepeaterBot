@@ -7,9 +7,12 @@ services:
       context: .
       dockerfile: Src/WordRepeaterBot/Dockerfile
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_Kestrel__Certificates__Default__Path: fullchain.pem
+      ASPNETCORE_Kestrel__Certificates__Default__KeyPath: privkey.pem
     ports:
       - 5080:80
+      - 8443:443
     depends_on:
       - postgresql
   postgresql:
@@ -18,8 +21,8 @@ services:
     environment:
       POSTGRES_USER: sobol
       POSTGRES_PASSWORD: Marlo2344
-    volumes:
-      - ./volumes/postgresql_data:/var/lib/postgresql/data
+    # volumes:
+    #   - ./volumes/postgresql_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
   pgadmin:
@@ -28,8 +31,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: eskapte@mail.ru
       PGADMIN_DEFAULT_PASSWORD: Marlo2344
-    volumes:
-      - ./volumes/pgadmin_data:/var/lib/pgadmin
+    # volumes:
+    #   - ./volumes/pgadmin_data:/var/lib/pgadmin
     ports:
       - 5431:80
     depends_on:

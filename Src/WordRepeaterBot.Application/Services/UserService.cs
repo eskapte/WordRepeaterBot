@@ -39,7 +39,7 @@ public class UserService : IUserService
             ChatId = chatId,
             UserId = userId,
             Username = username,
-            Created = DateTime.Now,
+            Created = DateTime.UtcNow,
             IsDisabled = false,
             Settings = settings
         };

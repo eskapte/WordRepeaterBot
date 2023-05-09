@@ -34,7 +34,7 @@ public class BotExceptionHandlerMiddleware
         }
         catch(Exception ex)
         {
-            _logger.LogWarning(ex.Message);
+            _logger.LogWarning(ex.Message + " " + ex.InnerException.Message + " " + ex.StackTrace);
         }
 
         context.Response.StatusCode = (int)HttpStatusCode.OK;

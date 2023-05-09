@@ -15,14 +15,6 @@ var config = builder.Configuration;
 var botConfigurationSection = config.GetSection(BotConfig.SECTION);
 var botConfiguration = botConfigurationSection.Get<BotConfig>();
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(443, listenOptions =>
-    {
-        listenOptions.UseHttps("../Certs/fullchain.pem");
-    });
-});
-
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services
