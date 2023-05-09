@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Src\WordRepeaterBot.Application\WordRepeaterBot.Application.csproj" />
+    <ProjectReference Include="..\WordRepeaterBot.Application\WordRepeaterBot.Application.csproj" />
   </ItemGroup>
 
 </Project>
