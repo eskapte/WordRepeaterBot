@@ -10,6 +10,7 @@ WORKDIR /src
 COPY ["Src/WordRepeaterBot/WordRepeaterBot.csproj", "Src/WordRepeaterBot/"]
 COPY ["Src/WordRepeaterBot.Application/WordRepeaterBot.Application.csproj", "Src/WordRepeaterBot.Application/"]
 COPY ["Src/WordRepeaterBot.DataAccess/WordRepeaterBot.DataAccess.csproj", "Src/WordRepeaterBot.DataAccess/"]
+COPY ["/etc/letsencrypt/live/atweek.fun/fullchain.pem", "Certs/"]
 RUN dotnet restore "Src/WordRepeaterBot/WordRepeaterBot.csproj"
 COPY . .
 WORKDIR "/src/Src/WordRepeaterBot"
