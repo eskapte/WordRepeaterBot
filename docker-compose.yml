@@ -3,6 +3,7 @@ version: '3.8'
 services:
   wordrepeaterbot:
     image: wordrepeaterbot
+    restart: always
     build:
       context: .
       dockerfile: Src/WordRepeaterBot/Dockerfile
@@ -17,24 +18,43 @@ services:
       - postgresql
   postgresql:
     image: postgres
+    restart: always
     container_name: postgresql_local
     environment:
       POSTGRES_USER: sobol
       POSTGRES_PASSWORD: Marlo2344
-    # volumes:
-    #   - ./volumes/postgresql_data:/var/lib/postgresql/data
+    volumes:
+      - ./volumes/postgresql_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin_local
-    environment:
-      PGADMIN_DEFAULT_EMAIL: eskapte@mail.ru
-      PGADMIN_DEFAULT_PASSWORD: Marlo2344
-    # volumes:
-    #   - ./volumes/pgadmin_data:/var/lib/pgadmin
-    ports:
-      - 5431:80
+  wordrepeaterbot-sender:
+    container_name: wordrepeaterbot-sender
+    build:
+      context: .
+      dockerfile: Src/WordRepeaterBot.Sender/Dockerfile
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.app.schedule: "@hourly"
+      ofelia.job-exec.app.command: "dotnet WordRepeaterBot.Sender.dll"
+  ofelia:
+    image: mcuadros/ofelia:latest
+    restart: always
     depends_on:
-      - postgresql
+      - sender-job
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin_local
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: eskapte@mail.ru
+  #     PGADMIN_DEFAULT_PASSWORD: Marlo2344
+  #   volumes:
+  #     - ./volumes/pgadmin_data:/var/lib/pgadmin
+  #   ports:
+  #     - 5431:80
+  #   depends_on:
+  #     - postgresql
         

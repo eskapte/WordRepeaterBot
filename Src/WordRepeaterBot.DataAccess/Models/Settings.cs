@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace WordRepeaterBot.DataAccess.Models;
+﻿namespace WordRepeaterBot.DataAccess.Models;
 
 /// <summary>
 /// Прочие настройки пользователя, к примеру, частота отправки сообщений

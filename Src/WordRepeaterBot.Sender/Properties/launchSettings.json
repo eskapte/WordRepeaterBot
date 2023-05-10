@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WordRepeaterBot.Sender": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
