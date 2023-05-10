@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using WordRepeaterBot.DataAccess;
+using WordRepeaterBot.Sender;
 
 await Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
@@ -17,6 +18,7 @@ await Host.CreateDefaultBuilder(args)
             var connectionString = config.GetConnectionString("WordRepeaterBotDb");
             builder.UseNpgsql(connectionString);
         })
+        .AddHostedService<Worker>()
         .AddHttpClient("telegram_bot_client")
         .AddTypedClient<ITelegramBotClient>((httpClient) =>
         {

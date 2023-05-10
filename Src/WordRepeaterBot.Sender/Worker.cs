@@ -26,8 +26,8 @@ internal class Worker : BackgroundService
     private const string LEARNING_TEMPLATE = "{0} - {1}";
     private const string REPEATER_TEMPLATE = "{0} - \\|\\|{1}\\|\\|";
 
-    private static InlineKeyboardButton learningInline = new("Запомнил");
-    private static InlineKeyboardButton repeatingInline = new("Выучено");
+    private static InlineKeyboardButton _learningInline = new("Запомнил");
+    private static InlineKeyboardButton _repeatingInline = new("Выучено");
 
     private readonly WordRepeaterBotDbContext _dbContext;
     private readonly ITelegramBotClient _botClient;
@@ -45,7 +45,7 @@ internal class Worker : BackgroundService
         foreach (var message in messages)
         {
             var text = message.Phrase.State == PhraseState.Learning ? LEARNING_TEMPLATE : REPEATER_TEMPLATE;
-            var inline = message.Phrase.State == PhraseState.Learning ? learningInline : repeatingInline;
+            var inline = message.Phrase.State == PhraseState.Learning ? _learningInline : _repeatingInline;
             var newState = message.Phrase.State++;
 
             inline = inline.CallbackData = $"{message.Phrase.Id} {newState}";
@@ -77,13 +77,13 @@ internal class Worker : BackgroundService
                 join settings in _dbContext.Settings on user.UserId equals settings.UserId
 
                 let phrasesCount = user.Phrases.Where(x => x.State != PhraseState.Learned).Count()
-                let randomPhrase = user.Phrases.Where(x => x.State != PhraseState.Learned).ToArray()[random.Next(phrasesCount)]
+                let phrases = user.Phrases.Where(x => x.State != PhraseState.Learned).ToArray()
 
                 where !user.IsDisabled 
                     && settings.FrequencePerDay == frequency
                     && hours.Contains((byte)(utcHour + settings.TimeZoneOffset))
                     && phrasesCount > 0
-                select new UserPhrase(user.UserId, user.ChatId, randomPhrase);
+                select new UserPhrase(user.UserId, user.ChatId, phrases[random.Next(phrasesCount)]);
 
             var userPhrases = await userPhrasesQuery.Include("Phrases").ToListAsync(token);
 
