@@ -3,6 +3,7 @@ version: '3.8'
 services:
   wordrepeaterbot:
     image: wordrepeaterbot
+    container_name: wordrepeaterbot
     restart: always
     build:
       context: .
@@ -19,7 +20,7 @@ services:
   postgresql:
     image: postgres
     restart: always
-    container_name: postgresql_local
+    container_name: postgresql
     environment:
       POSTGRES_USER: sobol
       POSTGRES_PASSWORD: Marlo2344
@@ -38,6 +39,7 @@ services:
       ofelia.job-exec.app.command: "dotnet WordRepeaterBot.Sender.dll"
   ofelia:
     image: mcuadros/ofelia:latest
+    container_name: ofelia-job-runner
     restart: always
     depends_on:
       - wordrepeaterbot-sender

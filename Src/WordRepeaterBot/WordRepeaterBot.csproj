@@ -22,8 +22,8 @@
     <ProjectReference Include="..\WordRepeaterBot.Application\WordRepeaterBot.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Content Include="..\..\..\Certs\**">
+  <ItemGroup>
+    <Content Include="..\Certs\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
