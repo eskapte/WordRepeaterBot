@@ -35,8 +35,8 @@ services:
       dockerfile: Src/WordRepeaterBot.Sender/Dockerfile
     labels:
       ofelia.enabled: "true"
-      ofelia.job-exec.app.schedule: "@hourly"
-      ofelia.job-exec.app.command: "dotnet WordRepeaterBot.Sender.dll"
+      ofelia.job-exec.sender.schedule: "@hourly"
+      ofelia.job-exec.sender.command: "dotnet WordRepeaterBot.Sender.dll"
   ofelia:
     image: mcuadros/ofelia:latest
     container_name: ofelia-job-runner

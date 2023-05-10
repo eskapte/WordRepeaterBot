@@ -85,7 +85,7 @@ internal class Worker : BackgroundService
                     && phrasesCount > 0
                 select new UserPhrase(user.UserId, user.ChatId, phrases[random.Next(phrasesCount)]);
 
-            var userPhrases = await userPhrasesQuery.Include("Phrases").ToListAsync(token);
+            var userPhrases = await userPhrasesQuery.ToListAsync(token);
 
             usersPhrase.AddRange(userPhrases);
         }

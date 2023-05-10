@@ -18,4 +18,4 @@ RUN dotnet publish "WordRepeaterBot.Sender.csproj" -c Release -o /app/publish /p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-#ENTRYPOINT ["dotnet", "WordRepeaterBot.Sender.dll"]
+ENTRYPOINT ["dotnet", "WordRepeaterBot.Sender.dll"]
