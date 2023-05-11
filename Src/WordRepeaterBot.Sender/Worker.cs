@@ -31,11 +31,16 @@ internal class Worker : BackgroundService
 
     private readonly WordRepeaterBotDbContext _dbContext;
     private readonly ITelegramBotClient _botClient;
+    private readonly IHostApplicationLifetime _hostApplicationLifetime;
 
-    public Worker(WordRepeaterBotDbContext dbContext, ITelegramBotClient botClient)
+    public Worker(
+        WordRepeaterBotDbContext dbContext, 
+        ITelegramBotClient botClient, 
+        IHostApplicationLifetime hostApplicationLifetime)
     {
         _dbContext = dbContext;
         _botClient = botClient;
+        _hostApplicationLifetime = hostApplicationLifetime;
     }
 
     protected override async Task ExecuteAsync(CancellationToken token)
@@ -58,6 +63,8 @@ internal class Worker : BackgroundService
                 replyMarkup: inlineKeyboard,
                 cancellationToken: token);
         }
+
+        _hostApplicationLifetime.StopApplication();
     }
 
     private record UserPhrase(long UserId, long ChatId, Phrase Phrase);
