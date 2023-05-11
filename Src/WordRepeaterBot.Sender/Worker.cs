@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 using WordRepeaterBot.DataAccess;
@@ -32,39 +33,51 @@ internal class Worker : BackgroundService
     private readonly WordRepeaterBotDbContext _dbContext;
     private readonly ITelegramBotClient _botClient;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
+    private readonly ILogger<Worker> _logger;
 
     public Worker(
         WordRepeaterBotDbContext dbContext, 
         ITelegramBotClient botClient, 
-        IHostApplicationLifetime hostApplicationLifetime)
+        IHostApplicationLifetime hostApplicationLifetime,
+        ILogger<Worker> logger)
     {
         _dbContext = dbContext;
         _botClient = botClient;
         _hostApplicationLifetime = hostApplicationLifetime;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken token)
     {
-        var messages = await GetUsersIdsToSendAsync(token);
-
-        foreach (var message in messages)
+        try
         {
-            var text = message.Phrase.State == PhraseState.Learning ? LEARNING_TEMPLATE : REPEATER_TEMPLATE;
-            var inline = message.Phrase.State == PhraseState.Learning ? _learningInline : _repeatingInline;
-            var newState = message.Phrase.State++;
+            var messages = await GetUsersIdsToSendAsync(token);
 
-            inline = inline.CallbackData = $"{message.Phrase.Id} {newState}";
-            var inlineKeyboard = new InlineKeyboardMarkup(inline!);
+            foreach (var message in messages)
+            {
+                var text = message.Phrase.State == PhraseState.Learning ? LEARNING_TEMPLATE : REPEATER_TEMPLATE;
+                var inline = message.Phrase.State == PhraseState.Learning ? _learningInline : _repeatingInline;
+                var newState = message.Phrase.State++;
 
-            await _botClient.SendTextMessageAsync(
-                message.ChatId,
-                string.Format(text, message.Phrase.Text, message.Phrase.Translation),
-                Telegram.Bot.Types.Enums.ParseMode.MarkdownV2,
-                replyMarkup: inlineKeyboard,
-                cancellationToken: token);
+                inline = inline.CallbackData = $"{message.Phrase.Id} {newState}";
+                var inlineKeyboard = new InlineKeyboardMarkup(inline!);
+
+                await _botClient.SendTextMessageAsync(
+                    message.ChatId,
+                    string.Format(text, message.Phrase.Text, message.Phrase.Translation),
+                    Telegram.Bot.Types.Enums.ParseMode.MarkdownV2,
+                    replyMarkup: inlineKeyboard,
+                    cancellationToken: token);
+            }
         }
-
-        _hostApplicationLifetime.StopApplication();
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message + " " + ex.InnerException?.Message + "\n" + ex.StackTrace);
+        }
+        finally
+        {
+            _hostApplicationLifetime.StopApplication();
+        }
     }
 
     private record UserPhrase(long UserId, long ChatId, Phrase Phrase);
