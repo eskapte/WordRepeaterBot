@@ -93,7 +93,7 @@ internal class Worker : BackgroundService
             var utcHour = DateTime.UtcNow.Hour;
 
             var userPhrasesQuery = 
-                from user in _dbContext.Users
+                from user in _dbContext.Users.Include(x => x.Phrases)
                 join settings in _dbContext.Settings on user.UserId equals settings.UserId
 
                 let phrasesCount = user.Phrases.Where(x => x.State != PhraseState.Learned).Count()
@@ -108,6 +108,8 @@ internal class Worker : BackgroundService
             var userPhrases = await userPhrasesQuery.ToListAsync(token);
 
             usersPhrase.AddRange(userPhrases);
+
+            _logger.LogInformation($"Found {userPhrases.Count()} phrases");
         }
 
         return usersPhrase;
