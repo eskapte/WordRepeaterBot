@@ -12,6 +12,9 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_Kestrel__Certificates__Default__Path: fullchain.pem
       ASPNETCORE_Kestrel__Certificates__Default__KeyPath: privkey.pem
+      BotConfig__Host: ${BotConfig__Host}
+      BotConfig__BotToken: ${BotToken}
+      ConnectionStrings__WordRepeaterBotDb: ${ConnectionStrings__WordRepeaterBotDb}
     ports:
       - 5080:80
       - 8443:443
@@ -37,6 +40,9 @@ services:
       ofelia.enabled: "true"
       ofelia.job-exec.sender.schedule: "@hourly"
       ofelia.job-exec.sender.command: "dotnet WordRepeaterBot.Sender.dll"
+    environment:
+      ConnectionStrings__WordRepeaterBotDb: ${ConnectionStrings__WordRepeaterBotDb}
+      BotToken: ${BotToken}
   ofelia:
     image: mcuadros/ofelia:latest
     container_name: ofelia-job-runner
