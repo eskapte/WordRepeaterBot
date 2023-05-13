@@ -49,6 +49,10 @@ public class PhraseService : IPhraseService
     public async Task UpdatePhraseStateAsync(long phraseId, PhraseState newState, CancellationToken token = default)
     {
         var phrase = await _dbContext.Phrases.FirstAsync(x => x.Id == phraseId, token);
+
+        if (phrase.State == newState)
+            return;
+
         phrase.State = newState;
 
         await _dbContext.SaveChangesAsync(token);
