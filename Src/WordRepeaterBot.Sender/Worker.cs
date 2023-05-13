@@ -25,7 +25,7 @@ internal class Worker : BackgroundService
     };
 
     private const string LEARNING_TEMPLATE = "{0} \\- {1}";
-    private const string REPEATER_TEMPLATE = "{0} \\- \\|\\|{1}\\|\\|";
+    private const string REPEATER_TEMPLATE = "{0} \\- ||{1}||";
 
     private readonly WordRepeaterBotDbContext _dbContext;
     private readonly ITelegramBotClient _botClient;
