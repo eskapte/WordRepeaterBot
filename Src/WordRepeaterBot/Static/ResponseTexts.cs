@@ -25,5 +25,8 @@ public static class ResponseTexts
     public readonly static string PhraseAddedSuccessful = "Фраза добавлена";
     public readonly static string PhraseAddedFailed = "Не удалось добавить новую фразу. Попробуйте ещё раз.";
 
+    public readonly static string OnRepeat = "Фраза добавлена на повторение";
+    public readonly static string OnLearned = "Отлично, ещё одно выученное слово";
+
     public readonly static string UnknowCommand = "Неизвестная команда";
 }

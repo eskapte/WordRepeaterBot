@@ -10,6 +10,7 @@ public static class AddApplicationServicesExtension
         services.AddScoped<ISettingsService, SettingsService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPhraseService, PhraseService>();
+        services.AddScoped<ICallbackQueryService, CallbackQueryService>();
 
         return services;
     }

@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Telegram.Bot;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WordRepeaterBot.Application.Services;
 using WordRepeaterBot.DataAccess.Models;
@@ -10,7 +8,7 @@ namespace WordRepeaterBot.Services;
 
 public interface IResponseService
 {
-    Task<ResponseMessages> GetResponseAsync(Message message, CancellationToken token = default);
+    Task<ResponseMessages> GetResponseAsync(Update update, CancellationToken token = default);
 }
 
 public class ResponseService : IResponseService
@@ -28,7 +26,19 @@ public class ResponseService : IResponseService
 
     // Добавить возможность просмотра пользователем статистики
     // Проверить, есть ли эвент на блокировку от пользователя
-    public async Task<ResponseMessages> GetResponseAsync(Message message, CancellationToken token = default)
+    public async Task<ResponseMessages> GetResponseAsync(Update update, CancellationToken token = default)
+    {
+        var responses = update.Type switch
+        {
+            UpdateType.Message => await OnMessageAsync(update.Message, token),
+            UpdateType.CallbackQuery => await OnCallbackQueryAsync(update.CallbackQuery, token),
+            _ => ResponseMessages.Empty()
+        };
+
+        return responses;
+    }
+
+    private async Task<ResponseMessages> OnMessageAsync(Message message, CancellationToken token = default)
     {
         var userId = message.From.Id;
 
@@ -53,6 +63,21 @@ public class ResponseService : IResponseService
         {
             return new ResponseMessages(Static.ResponseTexts.PhraseAddedFailed);
         }
+    }
+
+    private async Task<ResponseMessages> OnCallbackQueryAsync(CallbackQuery callback, CancellationToken token = default)
+    {
+        var payload = callback.Data.Split(" ");
+        var phraseId = long.Parse(payload[0]);
+        var phraseNewState = (PhraseState)byte.Parse(payload[1]);
+
+        await _phraseService.UpdatePhraseStateAsync(phraseId, phraseNewState, token);
+
+        var responseText = phraseNewState == PhraseState.Repeating
+            ? Static.ResponseTexts.OnRepeat
+            : Static.ResponseTexts.OnLearned;
+
+        return new(responseText);
     }
 
     private async Task<ResponseMessages> InitUserAsync(Message message, CancellationToken token = default)

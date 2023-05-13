@@ -10,10 +10,10 @@ public class BotCommand : IEquatable<string>
     public bool Equals(string other) => string.Equals(_command, other, StringComparison.InvariantCultureIgnoreCase);
     public override bool Equals(object obj)
     {
-        if (obj is null)
-            return false;
+        if (obj is string str)
+            return Equals(str);
 
-        return Equals(obj as string);
+        return false;
     }
 
     public static bool operator ==(BotCommand left, string right) => left.Equals(right);

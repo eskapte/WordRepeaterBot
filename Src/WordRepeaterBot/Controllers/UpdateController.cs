@@ -4,7 +4,6 @@ using Telegram.Bot.Types;
 using WordRepeaterBot.Services;
 using Telegram.Bot.Types.Enums;
 using WordRepeaterBot.Application.Services;
-using WordRepeaterBot.DataAccess.Models;
 
 namespace WordRepeaterBot.Controllers;
 
@@ -14,18 +13,15 @@ public class UpdateController : Controller
     private readonly IResponseService _responseService;
     private readonly ILogger<UpdateController> _logger;
     private readonly ITelegramBotClient _botClient;
-    private readonly IPhraseService _phraseService;
 
     public UpdateController(
         IResponseService responseService,
         ILogger<UpdateController> logger,
-        ITelegramBotClient botClient,
-        IPhraseService phraseService)
+        ITelegramBotClient botClient)
     {
         _responseService = responseService;
         _logger = logger;
         _botClient = botClient;
-        _phraseService = phraseService;
     }
 
     [HttpPost("update")]
@@ -37,18 +33,7 @@ public class UpdateController : Controller
             return BadRequest();
         }
 
-        if (update.Type == UpdateType.CallbackQuery)
-        {
-            await OnCallbackQueryAsync(update, token);
-            return Ok();
-        }
-
-        if (update.Type != UpdateType.Message)
-            return Ok();
-
-        var message = update.Message;
-
-        var responses = await _responseService.GetResponseAsync(message, token);
+        var responses = await _responseService.GetResponseAsync(update, token);
 
         foreach (var response in responses)
         {
@@ -63,7 +48,7 @@ public class UpdateController : Controller
     private async Task ResponseAsync(Models.ResponseMessage response, Update update, CancellationToken token = default)
     {
         var msg = await _botClient.SendTextMessageAsync(
-            update.Message.Chat.Id,
+            GetChatId(update),
             response.Text,
             ParseMode.MarkdownV2,
             replyMarkup: response.Markup,
@@ -71,38 +56,19 @@ public class UpdateController : Controller
 
         if (msg is null)
         {
-            var userId = update.Message.From.Id;
-            var chatId = update.Message.Chat.Id;
+            var userId = GetUserId(update);
+            var chatId = GetChatId(update);
             _logger.LogError($"Failed to send message to user {userId} and chat {chatId}");
         }
     }
 
-    private async Task OnCallbackQueryAsync(Update update, CancellationToken token = default)
+    private long GetUserId(Update update)
     {
-        var callbackQuery = update.CallbackQuery;
-        if (callbackQuery is null)
-        {
-            _logger.LogError($"{nameof(callbackQuery)} is null");
-            return;
-        }
+        return update.Message?.From?.Id ?? update.CallbackQuery?.From.Id ?? 0;
+    }
 
-        var payload = callbackQuery.Data.Split(" ");
-        var phraseId = long.Parse(payload[0]);
-        var phraseNewState = (PhraseState)byte.Parse(payload[1]);
-
-        await _phraseService.UpdatePhraseStateAsync(phraseId, phraseNewState, token);
-
-        // TODO: статистика выученных слов
-        var responseText = phraseNewState == PhraseState.Repeating 
-            ? "Фраза добавлена на повторение" 
-            : "Отлично, ещё одно выученное слово";
-
-        await _botClient.SendTextMessageAsync(
-            callbackQuery.Message.Chat.Id,
-            responseText,
-            ParseMode.MarkdownV2,
-            cancellationToken: token);
-
-        // TODO: обновлять инлайн кнопки потом
+    private long GetChatId(Update update)
+    {
+        return update.Message?.Chat.Id ?? update.CallbackQuery?.Message.Chat.Id ?? 0;
     }
 }

@@ -55,10 +55,10 @@ internal class Worker : BackgroundService
             foreach (var message in messages)
             {
                 var text = message.Phrase.State == PhraseState.Learning ? LEARNING_TEMPLATE : REPEATER_TEMPLATE;
-                var inlineText = message.Phrase.State == PhraseState.Learning ? "Запомнил" : "Выучил";
+                var inlineText = message.Phrase.State == PhraseState.Learning ? "На повтор" : "Выучено";
                 var newState = ++message.Phrase.State;
 
-                var inlineButton = InlineKeyboardButton.WithCallbackData(inlineText, $"{message.Phrase.Id} {newState}");
+                var inlineButton = InlineKeyboardButton.WithCallbackData(inlineText, $"{message.Phrase.Id} {(byte)newState}");
                 var inlineKeyboard = new InlineKeyboardMarkup(inlineButton);
 
                 await _botClient.SendTextMessageAsync(
@@ -108,8 +108,6 @@ internal class Worker : BackgroundService
             var userPhrases = await userPhrasesQuery.ToListAsync(token);
 
             usersPhrase.AddRange(userPhrases);
-
-            _logger.LogInformation($"Found {userPhrases.Count()} phrases");
         }
 
         return usersPhrase;
