@@ -24,11 +24,8 @@ internal class Worker : BackgroundService
         }
     };
 
-    private const string LEARNING_TEMPLATE = "{0} - {1}";
-    private const string REPEATER_TEMPLATE = "{0} - \\|\\|{1}\\|\\|";
-
-    private static InlineKeyboardButton _learningInline = new("Запомнил");
-    private static InlineKeyboardButton _repeatingInline = new("Выучено");
+    private const string LEARNING_TEMPLATE = "{0} \\- {1}";
+    private const string REPEATER_TEMPLATE = "{0} \\- \\|\\|{1}\\|\\|";
 
     private readonly WordRepeaterBotDbContext _dbContext;
     private readonly ITelegramBotClient _botClient;
@@ -49,6 +46,8 @@ internal class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken token)
     {
+        _logger.LogInformation("{0}: start sender job", DateTime.Now);
+
         try
         {
             var messages = await GetUsersIdsToSendAsync(token);
@@ -56,11 +55,11 @@ internal class Worker : BackgroundService
             foreach (var message in messages)
             {
                 var text = message.Phrase.State == PhraseState.Learning ? LEARNING_TEMPLATE : REPEATER_TEMPLATE;
-                var inline = message.Phrase.State == PhraseState.Learning ? _learningInline : _repeatingInline;
-                var newState = message.Phrase.State++;
+                var inlineText = message.Phrase.State == PhraseState.Learning ? "Запомнил" : "Выучил";
+                var newState = ++message.Phrase.State;
 
-                inline = inline.CallbackData = $"{message.Phrase.Id} {newState}";
-                var inlineKeyboard = new InlineKeyboardMarkup(inline!);
+                var inlineButton = InlineKeyboardButton.WithCallbackData(inlineText, $"{message.Phrase.Id} {newState}");
+                var inlineKeyboard = new InlineKeyboardMarkup(inlineButton);
 
                 await _botClient.SendTextMessageAsync(
                     message.ChatId,
@@ -76,6 +75,7 @@ internal class Worker : BackgroundService
         }
         finally
         {
+            _logger.LogInformation("{0}: end sender job", DateTime.Now);
             _hostApplicationLifetime.StopApplication();
         }
     }
@@ -92,12 +92,12 @@ internal class Worker : BackgroundService
             var hours = shedule.Value.ToList();
             var utcHour = DateTime.UtcNow.Hour;
 
-            var userPhrasesQuery = 
+            var userPhrasesQuery =
                 from user in _dbContext.Users.Include(x => x.Phrases)
                 join settings in _dbContext.Settings on user.UserId equals settings.UserId
 
-                let phrasesCount = user.Phrases.Where(x => x.State != PhraseState.Learned).Count()
                 let phrases = user.Phrases.Where(x => x.State != PhraseState.Learned).ToArray()
+                let phrasesCount = phrases.Count()
 
                 where !user.IsDisabled 
                     && settings.FrequencePerDay == frequency

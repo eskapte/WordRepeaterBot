@@ -3,7 +3,6 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using WordRepeaterBot.Services;
 using Telegram.Bot.Types.Enums;
-using WordRepeaterBot.Static;
 
 namespace WordRepeaterBot.Controllers;
 
@@ -27,14 +26,14 @@ public class UpdateController : Controller
     [HttpPost("update")]
     public async Task<IActionResult> Update([FromBody]Update update, CancellationToken token = default)
     {
-        if (update is null || update.Message is null)
+        if (update is null)
         {
-            _logger.LogWarning($"{nameof(update)} or {nameof(update.Message)} is null");
+            _logger.LogWarning($"{nameof(update)} is null");
             return BadRequest();
         }
 
 
-        if (update.Type == UpdateType.CallbackQuery || update.Type == UpdateType.InlineQuery)
+        if (update.Type == UpdateType.CallbackQuery)
         {
             return Ok();
         }
@@ -48,23 +47,28 @@ public class UpdateController : Controller
 
         foreach (var response in responses)
         {
-            if (response is null || string.IsNullOrWhiteSpace(response.Text)) continue;
-
-            var msg = await _botClient.SendTextMessageAsync(
-                update.Message.Chat.Id, 
-                response.Text, 
-                ParseMode.MarkdownV2,
-                replyMarkup: response.Markup,
-                cancellationToken: token);
-
-            if (msg is null)
-            {
-                var userId = update.Message.From.Id;
-                var chatId = update.Message.Chat.Id;
-                _logger.LogError($"Failed to send message to user {userId} and chat {chatId}");
-            }
+            if (response is null || string.IsNullOrWhiteSpace(response.Text)) 
+                continue;
+            await ResponseAsync(response, update, token);
         }
 
         return Ok();
+    }
+
+    private async Task ResponseAsync(Models.ResponseMessage response, Update update, CancellationToken token = default)
+    {
+        var msg = await _botClient.SendTextMessageAsync(
+            update.Message.Chat.Id,
+            response.Text,
+            ParseMode.MarkdownV2,
+            replyMarkup: response.Markup,
+            cancellationToken: token);
+
+        if (msg is null)
+        {
+            var userId = update.Message.From.Id;
+            var chatId = update.Message.Chat.Id;
+            _logger.LogError($"Failed to send message to user {userId} and chat {chatId}");
+        }
     }
 }
