@@ -9,6 +9,10 @@ public interface IPhraseService
 {
     Task<Phrase> ParsePhraseAsync(long userId, string text, CancellationToken token = default);
     Task UpdatePhraseStateAsync(long phraseId, PhraseState newState, CancellationToken token = default);
+
+    Task<(int learning, int repeating, int learned)> GetPhrasesStatisticsAsync(
+        long userId,
+        CancellationToken token = default);
 }
 
 public class PhraseService : IPhraseService
@@ -24,7 +28,10 @@ public class PhraseService : IPhraseService
 
     public async Task<Phrase> ParsePhraseAsync(long userId, string text, CancellationToken token = default)
     {
-        var phrases = text.Split(DELIMITER, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
+        var phrases = text
+            .Split(DELIMITER, StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => x.Trim())
+            .ToArray();
 
         if (phrases.Count() != 2)
         {
@@ -56,5 +63,20 @@ public class PhraseService : IPhraseService
         phrase.State = newState;
 
         await _dbContext.SaveChangesAsync(token);
+    }
+
+    public async Task<(int learning, int repeating, int learned)> GetPhrasesStatisticsAsync(
+        long userId, 
+        CancellationToken token = default)
+    {
+        var phrases = await _dbContext.Phrases.AsNoTracking()
+            .Where(x => x.UserId == userId)
+            .ToListAsync(token);
+
+        var learning = phrases.Count(x => x.State == PhraseState.Learning);
+        var repeating = phrases.Count(x => x.State == PhraseState.Repeating);
+        var learned = phrases.Count(x => x.State == PhraseState.Learned);
+
+        return (learning, repeating, learned);
     }
 }

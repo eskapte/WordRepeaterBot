@@ -10,10 +10,10 @@ public class ConfigureWebhook : IHostedService
     private readonly BotConfig _botConfig;
     private readonly ITelegramBotClient _telegramBotClient;
 
-    public ConfigureWebhook(IOptions<BotConfig> botConfig, ITelegramBotClient telegramBotclient)
+    public ConfigureWebhook(IOptions<BotConfig> botConfig, ITelegramBotClient telegramBotСlient)
     {
         _botConfig = botConfig.Value;
-        _telegramBotClient = telegramBotclient;
+        _telegramBotClient = telegramBotСlient;
     }
 
     public async Task StartAsync(CancellationToken token = default)

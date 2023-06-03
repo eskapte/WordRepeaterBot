@@ -33,6 +33,7 @@ services:
       - 5432:5432
   wordrepeaterbot-sender:
     container_name: wordrepeaterbot-sender
+    restart: always
     build:
       context: .
       dockerfile: Src/WordRepeaterBot.Sender/Dockerfile

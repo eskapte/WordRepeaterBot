@@ -5,7 +5,7 @@ public class BotCommand : IEquatable<string>
     private readonly string _command;
     protected BotCommand(string command) => _command = command;
 
-    public readonly static BotCommand Start = new("/start");
+    public static readonly BotCommand Start = new("/start");
 
     public bool Equals(string other) => string.Equals(_command, other, StringComparison.InvariantCultureIgnoreCase);
     public override bool Equals(object obj)

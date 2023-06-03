@@ -16,6 +16,7 @@ var botConfigurationSection = config.GetSection(BotConfig.SECTION);
 var botConfiguration = botConfigurationSection.Get<BotConfig>();
 
 builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services
     .Configure<BotConfig>(botConfigurationSection)
@@ -23,10 +24,10 @@ builder.Services
     .AddScoped<IResponseService, ResponseService>()
     .AddMemoryCache()
     .AddApplicationServices()
-    .AddDbContext<WordRepeaterBotDbContext>(builder =>
+    .AddDbContext<WordRepeaterBotDbContext>(options =>
     {
         var connectionString = config.GetConnectionString("WordRepeaterBotDb");
-        builder.UseNpgsql(connectionString);
+        options.UseNpgsql(connectionString);
     })
     .AddHttpClient("telegram_bot_client")
     .AddTypedClient<ITelegramBotClient>((httpClient, serviceProvider) =>

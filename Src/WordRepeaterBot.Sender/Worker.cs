@@ -10,7 +10,7 @@ namespace WordRepeaterBot.Sender;
 
 internal class Worker : BackgroundService
 {
-    private readonly static Dictionary<RepeatFrequencyInDay, byte[]> _shedules = new()
+    private static readonly Dictionary<RepeatFrequencyInDay, byte[]> _shedules = new()
     {
         [RepeatFrequencyInDay.One] = new byte[] { 16 },
         [RepeatFrequencyInDay.Two] = new byte[] { 14, 18 },

@@ -3,7 +3,6 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using WordRepeaterBot.Services;
 using Telegram.Bot.Types.Enums;
-using WordRepeaterBot.Application.Services;
 
 namespace WordRepeaterBot.Controllers;
 
@@ -32,7 +31,7 @@ public class UpdateController : Controller
             _logger.LogWarning($"{nameof(update)} is null");
             return BadRequest();
         }
-
+        
         var responses = await _responseService.GetResponseAsync(update, token);
 
         foreach (var response in responses)
@@ -54,6 +53,7 @@ public class UpdateController : Controller
             replyMarkup: response.Markup,
             cancellationToken: token);
 
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         if (msg is null)
         {
             var userId = GetUserId(update);
@@ -69,6 +69,6 @@ public class UpdateController : Controller
 
     private long GetChatId(Update update)
     {
-        return update.Message?.Chat.Id ?? update.CallbackQuery?.Message.Chat.Id ?? 0;
+        return update.Message?.Chat.Id ?? update.CallbackQuery?.Message?.Chat.Id ?? 0;
     }
 }

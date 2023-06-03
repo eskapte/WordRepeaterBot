@@ -12,6 +12,7 @@
 [Vv]olumes/
 .env
 Certs/
+.idea/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

@@ -70,12 +70,16 @@ public class ResponseService : IResponseService
         var payload = callback.Data.Split(" ");
         var phraseId = long.Parse(payload[0]);
         var phraseNewState = (PhraseState)byte.Parse(payload[1]);
+        var userId = callback.From.Id;
 
         await _phraseService.UpdatePhraseStateAsync(phraseId, phraseNewState, token);
 
         var responseText = phraseNewState == PhraseState.Repeating
             ? Static.ResponseTexts.OnRepeat
             : Static.ResponseTexts.OnLearned;
+
+        var (learning, repeating, learned) = await _phraseService.GetPhrasesStatisticsAsync(userId, token);
+        responseText = string.Format(responseText, learning, repeating, learned);
 
         return new(responseText);
     }
@@ -113,10 +117,10 @@ public class ResponseService : IResponseService
         }
         else
         {
-            return new ResponseMessages(Static.ResponseTexts.InvilidSetupValue);
+            return new ResponseMessages(Static.ResponseTexts.InvalidSetupValue);
         }
 
-        return new(GetNextMessageByStep(step));
+        return new ResponseMessages(GetNextMessageByStep(step));
     }
 
     private bool IsBotCommand(Message message, Static.BotCommand botCommand)
@@ -128,9 +132,9 @@ public class ResponseService : IResponseService
 
     private ResponseMessage GetNextMessageByStep(SettingsSetupStep? step) => step switch
     {
-        SettingsSetupStep.SetTimeZone => new(Static.ResponseTexts.SetupTimeZone),
-        SettingsSetupStep.SetFrequence => new(Static.ResponseTexts.SetupFrequence, Static.Keyboards.SetupFrequence),
-        null => new(Static.ResponseTexts.SetupCompleted, Static.Keyboards.Empty),
+        SettingsSetupStep.SetTimeZone => new ResponseMessage(Static.ResponseTexts.SetupTimeZone),
+        SettingsSetupStep.SetFrequence => new ResponseMessage(Static.ResponseTexts.SetupFrequence, Static.Keyboards.SetupFrequence),
+        null => new ResponseMessage(Static.ResponseTexts.SetupCompleted, Static.Keyboards.Empty),
         _ => throw new NotImplementedException()
     };
 }
