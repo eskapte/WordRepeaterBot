@@ -58,7 +58,9 @@ internal class Worker : BackgroundService
                 var inlineText = message.Phrase.State == PhraseState.Learning ? "На повтор" : "Выучено";
                 var newState = ++message.Phrase.State;
 
-                var inlineButton = InlineKeyboardButton.WithCallbackData(inlineText, $"{message.Phrase.Id} {(byte)newState}");
+                var inlineButton = InlineKeyboardButton.WithCallbackData(
+                    inlineText,
+                    $"{message.Phrase.Id} {(byte)newState}");
                 var inlineKeyboard = new InlineKeyboardMarkup(inlineButton);
 
                 await _botClient.SendTextMessageAsync(
@@ -71,11 +73,13 @@ internal class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message + " " + ex.InnerException?.Message + "\n" + ex.StackTrace);
+            _logger.LogError(
+                "{ExMessage} ${InnerExceptionMessage}\\n ${ExStackTrace}", 
+                ex.Message, ex.InnerException?.Message, ex.StackTrace);
         }
         finally
         {
-            _logger.LogInformation("{0}: end sender job", DateTime.Now);
+            _logger.LogInformation("{Date}: end sender job", DateTime.Now);
             _hostApplicationLifetime.StopApplication();
         }
     }
@@ -92,11 +96,14 @@ internal class Worker : BackgroundService
             var hours = shedule.Value.ToList();
             var utcHour = DateTime.UtcNow.Hour;
 
+            // More chance for send phrase in state "Repeating" than "Learning".
+            var state = random.NextSingle() > 0.7f ? PhraseState.Repeating : PhraseState.Learning;
+
             var userPhrasesQuery =
                 from user in _dbContext.Users.Include(x => x.Phrases)
                 join settings in _dbContext.Settings on user.UserId equals settings.UserId
 
-                let phrases = user.Phrases.Where(x => x.State != PhraseState.Learned).ToArray()
+                let phrases = user.Phrases.Where(x => x.State == state).ToArray()
                 let phrasesCount = phrases.Count()
 
                 where !user.IsDisabled 
