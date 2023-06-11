@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		.github\deploy.yml = .github\deploy.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordRepeaterBot.DataAccess", "Src\WordRepeaterBot.DataAccess\WordRepeaterBot.DataAccess.csproj", "{FDD1BEE4-AB54-49A5-815C-2665626C5B6C}"

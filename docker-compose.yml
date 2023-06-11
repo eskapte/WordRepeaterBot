@@ -16,8 +16,8 @@ services:
       BotConfig__BotToken: ${BotToken}
       ConnectionStrings__WordRepeaterBotDb: ${ConnectionStrings__WordRepeaterBotDb}
     ports:
-      - 5080:80
-      - 8443:443
+      - "5080:80"
+      - "8443:443"
     depends_on:
       - postgresql
   postgresql:
@@ -30,7 +30,7 @@ services:
     volumes:
       - ./volumes/postgresql_data:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
   wordrepeaterbot-sender:
     container_name: wordrepeaterbot-sender
     restart: always
@@ -53,16 +53,3 @@ services:
     command: daemon --docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgadmin_local
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: eskapte@mail.ru
-  #     PGADMIN_DEFAULT_PASSWORD: Marlo2344
-  #   volumes:
-  #     - ./volumes/pgadmin_data:/var/lib/pgadmin
-  #   ports:
-  #     - 5431:80
-  #   depends_on:
-  #     - postgresql
-        
