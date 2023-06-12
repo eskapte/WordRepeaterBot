@@ -13,7 +13,6 @@ var config = builder.Configuration;
 #region Services
 
 var botConfigurationSection = config.GetSection(BotConfig.SECTION);
-var botConfiguration = botConfigurationSection.Get<BotConfig>();
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddHttpContextAccessor();

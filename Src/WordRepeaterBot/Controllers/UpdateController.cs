@@ -52,14 +52,6 @@ public class UpdateController : Controller
             ParseMode.MarkdownV2,
             replyMarkup: response.Markup,
             cancellationToken: token);
-
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-        if (msg is null)
-        {
-            var userId = GetUserId(update);
-            var chatId = GetChatId(update);
-            _logger.LogError($"Failed to send message to user {userId} and chat {chatId}");
-        }
     }
 
     private long GetUserId(Update update)

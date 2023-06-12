@@ -103,14 +103,18 @@ internal class Worker : BackgroundService
                 from user in _dbContext.Users.Include(x => x.Phrases)
                 join settings in _dbContext.Settings on user.UserId equals settings.UserId
 
-                let phrases = user.Phrases.Where(x => x.State == state).ToArray()
+                let phrases = user.Phrases.ToArray()
                 let phrasesCount = phrases.Count()
+                let isAnyRepeating = phrases.Any(x => x.State == PhraseState.Repeating)
+                let filteredPhrases = isAnyRepeating
+                    ? phrases.Where(x => x.State == state).ToArray()
+                    : phrases
 
                 where !user.IsDisabled 
-                    && settings.FrequencePerDay == frequency
-                    && hours.Contains((byte)(utcHour + settings.TimeZoneOffset))
-                    && phrasesCount > 0
-                select new UserPhrase(user.UserId, user.ChatId, phrases[random.Next(phrasesCount)]);
+                      && settings.FrequencePerDay == frequency
+                      && hours.Contains((byte)(utcHour + settings.TimeZoneOffset))
+                      && phrasesCount > 0
+                select new UserPhrase(user.UserId, user.ChatId, filteredPhrases[random.Next(phrasesCount)]);
 
             var userPhrases = await userPhrasesQuery.ToListAsync(token);
 
