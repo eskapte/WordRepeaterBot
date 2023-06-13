@@ -46,7 +46,7 @@ internal class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken token)
     {
-        _logger.LogInformation("{0}: start sender job", DateTime.Now);
+        _logger.LogInformation("{DateTime}: start sender job", DateTime.Now);
 
         try
         {
@@ -90,35 +90,45 @@ internal class Worker : BackgroundService
         var usersPhrase = new List<UserPhrase>();
         var random = new Random();
 
-        foreach (var shedule in _shedules)
+        foreach (var (frequency, hours) in _shedules)
         {
-            var frequency = shedule.Key;
-            var hours = shedule.Value.ToList();
             var utcHour = DateTime.UtcNow.Hour;
 
-            // More chance for send phrase in state "Repeating" than "Learning".
-            var state = random.NextSingle() > 0.7f ? PhraseState.Repeating : PhraseState.Learning;
-
             var userPhrasesQuery =
-                from user in _dbContext.Users.Include(x => x.Phrases)
-                join settings in _dbContext.Settings on user.UserId equals settings.UserId
+                from user in _dbContext.Users
+                    .Include(x => x.Phrases)
+                    .Include(x => x.Settings)
 
                 let phrases = user.Phrases.ToArray()
-                let phrasesCount = phrases.Count()
-                let isAnyRepeating = phrases.Any(x => x.State == PhraseState.Repeating)
-                let filteredPhrases = isAnyRepeating
-                    ? phrases.Where(x => x.State == state).ToArray()
-                    : phrases
 
-                where !user.IsDisabled 
-                      && settings.FrequencePerDay == frequency
-                      && hours.Contains((byte)(utcHour + settings.TimeZoneOffset))
-                      && phrasesCount > 0
-                select new UserPhrase(user.UserId, user.ChatId, filteredPhrases[random.Next(phrasesCount)]);
+                where !user.IsDisabled && user.Settings != null
+                      && user.Settings.FrequencePerDay == frequency
+                      && hours.Contains((byte)(utcHour + user.Settings.TimeZoneOffset))
+                      && phrases.Any()
+                select new { user.UserId, user.ChatId, Phrases = phrases };
 
-            var userPhrases = await userPhrasesQuery.ToListAsync(token);
+            var userPhrases = await userPhrasesQuery.AsNoTracking().ToListAsync(token);
 
-            usersPhrase.AddRange(userPhrases);
+            if (!userPhrases.Any())
+            {
+                continue;
+            }
+
+            var result = userPhrases.Select(x =>
+            {
+                var phrases = x.Phrases;
+                
+                if (x.Phrases.Any(y => y.State == PhraseState.Repeating))
+                {
+                    var state = random.NextSingle() > 0.7f ? PhraseState.Learning : PhraseState.Repeating;
+                    phrases = x.Phrases.Where(y => y.State == state).ToArray();
+                }
+
+                var phrasesCount = phrases.Length;
+                return new UserPhrase(x.UserId, x.ChatId, phrases[random.Next(phrasesCount)]);
+            });
+            
+            usersPhrase.AddRange(result);
         }
 
         return usersPhrase;
