@@ -100,11 +100,12 @@ internal class Worker : BackgroundService
                     .Include(x => x.Settings)
 
                 let phrases = user.Phrases.ToArray()
+                let phrasesCount = phrases.Length
 
                 where !user.IsDisabled && user.Settings != null
-                      && user.Settings.FrequencePerDay == frequency
-                      && hours.Contains((byte)(utcHour + user.Settings.TimeZoneOffset))
-                      && phrases.Any()
+                                       && user.Settings.FrequencePerDay == frequency
+                                       && hours.Contains((byte)(utcHour + user.Settings.TimeZoneOffset))
+                                       && phrasesCount > 0
                 select new { user.UserId, user.ChatId, Phrases = phrases };
 
             var userPhrases = await userPhrasesQuery.AsNoTracking().ToListAsync(token);
