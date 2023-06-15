@@ -84,7 +84,7 @@ internal class Worker : BackgroundService
         }
     }
 
-    private record UserPhrase(long UserId, long ChatId, Phrase Phrase);
+    private record UserPhrase(long ChatId, Phrase Phrase);
     private async Task<IEnumerable<UserPhrase>> GetUsersIdsToSendAsync(CancellationToken token = default)
     {
         var usersPhrase = new List<UserPhrase>();
@@ -98,15 +98,11 @@ internal class Worker : BackgroundService
                 from user in _dbContext.Users
                     .Include(x => x.Phrases)
                     .Include(x => x.Settings)
-
-                let phrases = user.Phrases.ToArray()
-                let phrasesCount = phrases.Length
-
                 where !user.IsDisabled && user.Settings != null
                                        && user.Settings.FrequencePerDay == frequency
                                        && hours.Contains((byte)(utcHour + user.Settings.TimeZoneOffset))
-                                       && phrasesCount > 0
-                select new { user.UserId, user.ChatId, Phrases = phrases };
+                                       && user.Phrases.Any()
+                select new { user.ChatId, user.Phrases };
 
             var userPhrases = await userPhrasesQuery.AsNoTracking().ToListAsync(token);
 
@@ -117,7 +113,7 @@ internal class Worker : BackgroundService
 
             var result = userPhrases.Select(x =>
             {
-                var phrases = x.Phrases;
+                var phrases = x.Phrases.ToArray();
                 
                 if (x.Phrases.Any(y => y.State == PhraseState.Repeating))
                 {
@@ -126,7 +122,7 @@ internal class Worker : BackgroundService
                 }
 
                 var phrasesCount = phrases.Length;
-                return new UserPhrase(x.UserId, x.ChatId, phrases[random.Next(phrasesCount)]);
+                return new UserPhrase(x.ChatId, phrases[random.Next(phrasesCount)]);
             });
             
             usersPhrase.AddRange(result);
