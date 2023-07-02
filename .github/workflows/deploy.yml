@@ -15,10 +15,7 @@ jobs:
           user: ${{secrets.SSH_USER}}
           private_key: ${{secrets.SSH_PRIVATE_KEY}}
           command: |
-            if [ ! -d "app" ] \
-            then \
-            git clone ${{ secrets.GIT_URL }} app \
-            fi;
+            if [ ! -d "app" ] then git clone ${{ secrets.GIT_URL }} app fi;
             cd app;
             git checkout main;
             git fetch;
