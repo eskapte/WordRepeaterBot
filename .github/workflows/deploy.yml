@@ -8,18 +8,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Configure environment variables
-        run: |
-          echo BotConfig__Host=\"${{ secrets.BOT_CONFIG_HOST }}\" > .env
-          echo BotToken=\"${{ secrets.BOT_TOKEN }}\" >> .env
-          echo ConnectionStrings__WordRepeaterBotDb=\"${{ secrets.BOT_CONFIG_HOST }}\" >> .env
-      - name: Docker-Compose Remote Deployment
-        uses: alex-ac/github-action-ssh-docker-compose@master
+      - name: Run command on remote server
+        uses: D3rHase/ssh-command-action@v0.2.2
         with:
-          ssh_host: ${{ secrets.DEPLOY_HOST }}
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          ssh_user: ${{ secrets.SSH_USER }}
-          docker_compose_prefix: word-repeater-bot
-          docker_compose_filename: ./docker-compose.yml
+          host: ${{secrets.DEPLOY_HOST}}
+          user: ${{secrets.SSH_USER}}
+          private_key: ${{secrets.SSH_PRIVATE_KEY}}
+          command: |
+            if [ ! -d "app" ] \
+            then \
+            git clone ${{ secrets.GIT_URL }} app \
+            fi;
+            cd app;
+            git checkout main;
+            git fetch;
+            git pull origin master;
+            echo BotConfig__Host=\"${{ secrets.BOT_CONFIG_HOST }}\" > .env;
+            echo BotToken=\"${{ secrets.BOT_TOKEN }}\" >> .env;
+            echo ConnectionStrings__WordRepeaterBotDb=\"${{ secrets.BOT_CONFIG_HOST }}\" >> .env;
+            docker-compose --file docker-compose.yml down;
+            docker-compose --file docker-compose.yml up -d;
+            docker system prune --all --force;
