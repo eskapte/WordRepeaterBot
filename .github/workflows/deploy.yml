@@ -9,15 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup .Net core SDK 
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "7.x.x"
-      - name: Restore dependencies
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
+      - name: Docker-compose build
+        run: docker-compose build
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Run command on remote server
