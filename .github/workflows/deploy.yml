@@ -8,6 +8,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - name: Setup .Net core SDK 
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "7.x.x"
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
       - name: Run command on remote server
         uses: D3rHase/ssh-command-action@v0.2.2
         with:
@@ -20,9 +32,10 @@ jobs:
             git checkout main;
             git fetch;
             git pull origin master;
+            docker-compose --file docker-compose.yml down;
             echo BotConfig__Host=\"${{ secrets.BOT_CONFIG_HOST }}\" > .env;
             echo BotToken=\"${{ secrets.BOT_TOKEN }}\" >> .env;
             echo ConnectionStrings__WordRepeaterBotDb=\"${{ secrets.BOT_CONFIG_HOST }}\" >> .env;
-            docker-compose --file docker-compose.yml down;
+            docker-compose build
             docker-compose --file docker-compose.yml up -d;
             docker system prune --all --force;
