@@ -9,7 +9,7 @@ services:
       context: .
       dockerfile: Src/WordRepeaterBot/Dockerfile
     volumes:
-      - /etc/letsencrypt/live/atweek.fun:./certs
+      - /etc/letsencrypt/live/atweek.fun:/app/certs
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_Kestrel__Certificates__Default__Path: certs/fullchain.pem
