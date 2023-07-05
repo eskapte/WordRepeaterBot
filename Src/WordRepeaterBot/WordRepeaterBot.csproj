@@ -22,10 +22,4 @@
     <ProjectReference Include="..\WordRepeaterBot.Application\WordRepeaterBot.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="..\..\..\Certs\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>

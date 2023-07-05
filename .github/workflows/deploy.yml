@@ -33,4 +33,3 @@ jobs:
             echo ConnectionStrings__WordRepeaterBotDb=\"${{ secrets.BOT_CONFIG_HOST }}\" >> .env;
             docker-compose --file docker-compose.yml up --build;
             docker-compose --file docker-compose.yml up -d;
-            docker system prune --all --force;
