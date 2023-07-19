@@ -23,7 +23,7 @@ services:
     depends_on:
       - postgresql
   postgresql:
-    image: postgres:2.31
+    image: postgres
     restart: always
     container_name: postgresql
     environment:
