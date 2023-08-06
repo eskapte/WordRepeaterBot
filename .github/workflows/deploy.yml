@@ -31,8 +31,8 @@ jobs:
             echo BotConfig__Host=\"${{ secrets.BOT_CONFIG_HOST }}\" > .env;
             echo BotToken=\"${{ secrets.BOT_TOKEN }}\" >> .env;
             echo 'ConnectionStrings__WordRepeaterBotDb=${{ secrets.DB_CONNECTION_STRING }}' >> .env;
-            echo "=== BUILD ==="
-            docker-compose --file docker-compose.yml up --build --build-arg uid=`id -u` --build-arg gid=`id -g` --force-recreate
-            echo "=== UP ==="
+            echo "=== BUILD ===\n";
+            docker-compose --file docker-compose.yml up --build --build-arg uid=`id -u` --build-arg gid=`id -g` --force-recreate;
+            echo "=== UP ===\n";
             docker-compose --file docker-compose.yml up -d --force-recreate;
             docker system prune -a
