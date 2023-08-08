@@ -17,15 +17,16 @@ public class ResponseService : IResponseService
     private readonly IUserService _userService;
     private readonly IPhraseService _phraseService;
 
-    public ResponseService(ISettingsService settingsService, IUserService userService, IPhraseService phraseService)
+    public ResponseService(
+        ISettingsService settingsService, 
+        IUserService userService, 
+        IPhraseService phraseService)
     {
         _settingsService = settingsService;
         _userService = userService;
         _phraseService = phraseService;
     }
-
-    // Добавить возможность просмотра пользователем статистики
-    // Проверить, есть ли эвент на блокировку от пользователя
+    
     public async Task<ResponseMessages> GetResponseAsync(Update update, CancellationToken token = default)
     {
         var responses = update.Type switch

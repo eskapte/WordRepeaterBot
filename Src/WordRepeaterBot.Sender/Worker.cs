@@ -101,11 +101,17 @@ internal class Worker : BackgroundService
                 where !user.IsDisabled && user.Settings != null
                                        && user.Settings.FrequencePerDay == frequency
                                        && hours.Contains((byte)(utcHour + user.Settings.TimeZoneOffset))
-                                       && user.Phrases.Any()
+                                       && user.Phrases.Any(x => x.State != PhraseState.Learned)
                 select new { user.ChatId, user.Phrases };
 
             var userPhrases = await userPhrasesQuery.AsNoTracking().ToListAsync(token);
 
+            userPhrases = userPhrases.Select(x => new
+            {
+                x.ChatId, 
+                Phrases = x.Phrases.Where(y => y.State != PhraseState.Learned).ToList()
+            }).ToList();
+            
             if (!userPhrases.Any())
             {
                 continue;

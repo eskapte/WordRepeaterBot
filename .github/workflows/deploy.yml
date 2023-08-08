@@ -36,4 +36,4 @@ jobs:
             docker-compose build --build-arg uid=`id -u` --build-arg gid=`id -g`;
             echo "=== UP ===\n";
             docker-compose up -d;
-            docker system prune -a
+            docker system prune -a -y

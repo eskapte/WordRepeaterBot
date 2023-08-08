@@ -28,7 +28,7 @@ services:
     container_name: postgresql
     environment:
       POSTGRES_USER: sobol
-      POSTGRES_PASSWORD: Marlo2344
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
     volumes:
       - ./volumes/postgresql_data:/var/lib/postgresql/data
     ports:
