@@ -31,9 +31,10 @@ jobs:
             echo BotConfig__Host=\"${{ secrets.BOT_CONFIG_HOST }}\" > .env;
             echo BotToken=\"${{ secrets.BOT_TOKEN }}\" >> .env;
             echo 'ConnectionStrings__WordRepeaterBotDb=${{ secrets.DB_CONNECTION_STRING }}' >> .env;
+            echo 'PG_PASSWORD=${{ secrets.PG_PASSWORD }}' >> .env;
             pwd;
             echo "=== BUILD ===\n";
             docker-compose build --build-arg uid=`id -u` --build-arg gid=`id -g`;
             echo "=== UP ===\n";
             docker-compose up -d;
-            docker system prune -a -y
+#            docker system prune -a
