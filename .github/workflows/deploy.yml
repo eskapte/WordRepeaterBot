@@ -5,14 +5,14 @@ on:
     branches: [ master ]
     
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Docker-compose build
-        run: docker-compose build
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Docker-compose build
+#        run: docker-compose build
   deploy:
-    needs: build
+#    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Run command on remote server
@@ -33,7 +33,7 @@ jobs:
             echo 'ConnectionStrings__WordRepeaterBotDb=${{ secrets.DB_CONNECTION_STRING }}' >> .env;
             pwd;
             echo "=== BUILD ===\n";
-            docker-compose build --build-arg uid=`id -u` --build-arg gid=`id -g`
+            docker-compose build --build-arg uid=`id -u` --build-arg gid=`id -g`;
             echo "=== UP ===\n";
-            docker-compose up -d
+            docker-compose up -d;
             docker system prune -a
