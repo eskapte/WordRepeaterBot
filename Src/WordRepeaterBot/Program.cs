@@ -8,6 +8,7 @@ using WordRepeaterBot.Middleware;
 using WordRepeaterBot.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddFile($"{Directory.GetCurrentDirectory()}/Logs/log.txt", LogLevel.Information);
 var config = builder.Configuration;
 
 #region Services
