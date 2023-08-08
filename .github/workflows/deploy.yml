@@ -33,9 +33,7 @@ jobs:
             echo 'ConnectionStrings__WordRepeaterBotDb=${{ secrets.DB_CONNECTION_STRING }}' >> .env;
             pwd;
             echo "=== BUILD ===\n";
-#            docker-compose --file docker-compose.yml up --build;
             docker-compose build --build-arg uid=`id -u` --build-arg gid=`id -g`
             echo "=== UP ===\n";
             docker-compose up -d
-#            docker-compose --file docker-compose.yml up -d;
             docker system prune -a
