@@ -29,7 +29,7 @@ public static class ResponseTexts
                                                "Слов на повторении: {1}\n" +
                                                "Слов изучено: {2}";
     public static readonly string OnRepeat = $"Фраза добавлена на повторение\n\n{Statistics}";
-    public static readonly string OnLearned = $"Отлично, ещё одно выученная фраза\n\n{Statistics}";
+    public static readonly string OnLearned = $"Отлично, ещё одна выученная фраза\n\n{Statistics}";
 
     public static readonly string UnknownCommand = "Неизвестная команда";
 }
