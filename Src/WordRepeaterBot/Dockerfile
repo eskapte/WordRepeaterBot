@@ -19,4 +19,5 @@ RUN dotnet publish "WordRepeaterBot.csproj" -c Release -o /app/publish /p:UseApp
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV ASPNETCORE_ENVIRONMENT=Production
 ENTRYPOINT ["dotnet", "WordRepeaterBot.dll"]

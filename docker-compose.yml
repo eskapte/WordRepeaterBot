@@ -12,6 +12,7 @@ services:
       - /certs:/app/certs
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+      DOTNET_ENVIRONMENT: Production
       ASPNETCORE_Kestrel__Certificates__Default__Path: certs/fullchain.pem
       ASPNETCORE_Kestrel__Certificates__Default__KeyPath: certs/privkey.pem
       BotConfig__Host: ${BotConfig__Host}
