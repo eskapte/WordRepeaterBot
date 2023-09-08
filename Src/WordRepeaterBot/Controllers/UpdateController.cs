@@ -32,6 +32,7 @@ public class UpdateController : Controller
             return BadRequest();
         }
         
+        _logger.LogInformation($"Received update request. From: {update?.Message?.From?.Username}");
         var responses = await _responseService.GetResponseAsync(update, token);
 
         foreach (var response in responses)
