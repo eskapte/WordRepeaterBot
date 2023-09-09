@@ -93,14 +93,12 @@ public class ResponseService : IResponseService
         if (isUserExist)
         {
             await _userService.EnableUserAsync(userId, token);
+            return new ResponseMessages(Static.ResponseTexts.UserReturn);
         }
-        else
-        {
-            await _userService.CreateUserAsync(userId, message.Chat.Id, message.From.Username, token);
-        }
-
+        
+        await _userService.CreateUserAsync(userId, message.Chat.Id, message.From.Username, token);
         await _settingsService.SetSettingsSetupStepAsync(userId, SettingsSetupStep.SetTimeZone, token);
-
+        
         return new ResponseMessages(Static.ResponseTexts.Start, Static.ResponseTexts.SetupTimeZone);
     }
 
