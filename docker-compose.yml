@@ -28,8 +28,8 @@ services:
     restart: always
     container_name: postgresql
     environment:
-      POSTGRES_USER: sobol
-      POSTGRES_PASSWORD: Marlo2344
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
     volumes:
       - ./volumes/postgresql_data:/var/lib/postgresql/data
     user: 1002:1002
