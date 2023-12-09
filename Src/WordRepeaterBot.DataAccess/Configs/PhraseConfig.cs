@@ -11,3 +11,4 @@ public class PhraseConfig : IEntityTypeConfiguration<Phrase>
         builder.HasKey(x => x.Id);
     }
 }
+
