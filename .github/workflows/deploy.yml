@@ -28,6 +28,7 @@ jobs:
             git fetch;
             git pull origin master;
             docker-compose --file docker-compose.yml down;
+            rm .env
             echo BotConfig__Host=\"${{ secrets.BOT_CONFIG_HOST }}\" > .env;
             echo BotToken=\"${{ secrets.BOT_TOKEN }}\" >> .env;
             echo 'ConnectionStrings__WordRepeaterBotDb=${{ secrets.DB_CONNECTION_STRING }}' >> .env;
